@@ -25,10 +25,28 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("socket connected:", socket.id);
 
-  socket.on("ping-test", (msg) => {
-    socket.emit("pong-test", msg);
+  socket.on("room:join", ({ room }) => {
+    socket.join(room);
+    console.log(`socket ${socket.id} joined room ${room}`);
+
+    // notify others in the room
+    socket.to(room).emit("peer:joined", { id: socket.id });
+  });
+
+  socket.on("signal", ({ room, data }) => {
+    console.log("signal relayed:", room, data.type);
+
+    socket.to(room).emit("signal", {
+      from: socket.id,
+      data,
+    });
+  });
+
+  socket.on("disconnect", () => {
+    console.log("socket disconnected:", socket.id);
   });
 });
+
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
