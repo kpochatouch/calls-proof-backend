@@ -5,6 +5,10 @@ const { Server } = require("socket.io");
 
 const app = express();
 
+app.get("/", (req, res) => {
+  res.send("Calls proof backend is running");
+});
+
 app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
